@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ahorcado</string>
+    <string name="tap_to_continue">Toca para continuar</string>
+    <string name="title">Ahorcado</string>
+    <string name="settings">Ajustes</string>
+    <string name="toggle_theme">Cambiar claro/oscuro</string>
+    <string name="you_win">¡Ganaste!</string>
+    <string name="you_lose">¡Perdiste!</string>
+    <string name="level_selector_title">Seleccionar nivel</string>
+    <string name="letters_count">Letras: %1$d</string>
+    <string name="difficulty_easy">Fácil</string>
+    <string name="difficulty_medium">Media</string>
+    <string name="difficulty_hard">Difícil</string>
+    <string name="return_to_levels">Toca para volver</string>
+</resources>

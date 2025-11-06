@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <include layout="@layout/topbar"/>
+
+    <ImageView
+        android:id="@+id/imgHangman"
+        android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/topbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.35"
+        android:contentDescription="@string/app_name"/>
+
+    <TextView
+        android:id="@+id/tvWordMasked"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/imgHangman"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:text="_ _ _ _"
+        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+        android:padding="12dp"/>
+
+    <GridLayout
+        android:id="@+id/gridKeyboard"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvWordMasked"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        android:columnCount="7"
+        android:rowCount="4"
+        android:padding="8dp" />
+
+    <include android:id="@+id/topbar"  layout="@layout/topbar" />
+
+    <FrameLayout
+        android:id="@+id/resultOverlay"
+        android:layout_width="0dp" android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="#80000000"
+        android:clickable="true">
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:gravity="center" android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvResultText"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="36sp" android:textColor="@android:color/white"/>
+            <TextView
+                android:id="@+id/tvReturnHint"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/return_to_levels" android:textColor="@android:color/white"
+                android:layout_marginTop="12dp"/>
+        </LinearLayout>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
