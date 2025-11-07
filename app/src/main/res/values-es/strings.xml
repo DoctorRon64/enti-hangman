@@ -13,4 +13,5 @@
     <string name="difficulty_medium">Media</string>
     <string name="difficulty_hard">Difícil</string>
     <string name="return_to_levels">Toca para volver</string>
+    <string name="toggle_translation">Cambiar Idioma</string>
 </resources>

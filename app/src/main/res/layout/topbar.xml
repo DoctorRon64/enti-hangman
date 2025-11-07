@@ -1,22 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topbar"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
-        android:theme="?attr/actionBarTheme"
-        android:padding="8dp">
+        android:minHeight="64dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_settings_24"
-            android:contentDescription="@string/settings"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_gravity="end"/>
-    </com.google.android.material.appbar.MaterialToolbar>
-</layout>
+            android:text="@string/settings"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/switchLang"
+            app:layout_constraintEnd_toStartOf="@+id/switchLang"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/switchLang"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/toggle_translation"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_language"
+            app:backgroundTint="?attr/colorControlHighlight"
+            app:tint="?attr/colorOnSurface"
+            app:layout_constraintEnd_toStartOf="@+id/switchTheme"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/switchTheme"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/toggle_theme"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_theme"
+            app:backgroundTint="?attr/colorControlHighlight"
+            app:tint="?attr/colorOnSurface"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</merge>

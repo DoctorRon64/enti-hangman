@@ -6,8 +6,11 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Button
 import android.widget.GridLayout
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hangman.databinding.ActivityGameBinding
+import com.example.hangman.databinding.TopbarBinding
+import com.example.hangman.util.ThemeManager
 
 class GameActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGameBinding
@@ -26,6 +29,7 @@ class GameActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupTopbar()
+
         val index = intent.getIntExtra("level_index", 0)
         word = LevelRepository.getLevels()[index].word.uppercase()
         masked = CharArray(word.length) { if (word[it] == ' ') ' ' else '_' }
@@ -52,14 +56,29 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun setupTopbar() {
-        val btn = binding.topbar.findViewById<android.widget.ImageButton>(R.id.btnSettings)
-        btn.setOnClickListener { view ->
-            val popup = android.widget.PopupMenu(this, view)
+        val topbar = binding.topbar
+
+        // set initial icon depending on current theme state
+        val isDark = ThemeManager.isDarkMode(this)
+        topbar.btnSettings.setImageResource(
+            if (isDark) R.drawable.ic_dark_mode
+            else R.drawable.ic_light_mode
+        )
+
+        topbar.btnSettings.setOnClickListener { view ->
+            val popup = PopupMenu(this, view)
             popup.menu.add(getString(R.string.toggle_theme))
                 .setOnMenuItemClickListener {
-                    val currentNight = prefs.getBoolean("dark_mode", false)
-                    prefs.edit().putBoolean("dark_mode", !currentNight).apply()
-                    recreate()
+
+                    val currentlyDark = ThemeManager.isDarkMode(this)
+                    ThemeManager.applyTheme(this, !currentlyDark)
+
+                    // update icon
+                    topbar.btnSettings.setImageResource(
+                        if (!currentlyDark) R.drawable.ic_dark_mode
+                        else R.drawable.ic_light_mode
+                    )
+
                     true
                 }
             popup.show()

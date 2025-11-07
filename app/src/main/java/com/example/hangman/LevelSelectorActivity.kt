@@ -3,10 +3,12 @@ package com.example.hangman
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.PopupMenu
 import com.example.hangman.databinding.TopbarBinding
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hangman.databinding.ActivityLevelSelectorBinding
+import com.example.hangman.util.ThemeManager
 
 class LevelSelectorActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLevelSelectorBinding
@@ -41,15 +43,29 @@ class LevelSelectorActivity : AppCompatActivity() {
     }
 
     private fun setupTopbar() {
-        val topbarBinding = TopbarBinding.bind(binding.topbar)
-        topbarBinding.btnSettings.setOnClickListener { view ->
+        val topbar = binding.topbar
 
-            val popup = android.widget.PopupMenu(this, view)
+        // set initial icon depending on current theme state
+        val isDark = ThemeManager.isDarkMode(this)
+        topbar.btnSettings.setImageResource(
+            if (isDark) R.drawable.ic_dark_mode
+            else R.drawable.ic_light_mode
+        )
+
+        topbar.btnSettings.setOnClickListener { view ->
+            val popup = PopupMenu(this, view)
             popup.menu.add(getString(R.string.toggle_theme))
                 .setOnMenuItemClickListener {
-                    val currentNight = prefs.getBoolean("dark_mode", false)
-                    prefs.edit().putBoolean("dark_mode", !currentNight).apply()
-                    recreate()
+
+                    val currentlyDark = ThemeManager.isDarkMode(this)
+                    ThemeManager.applyTheme(this, !currentlyDark)
+
+                    // update icon
+                    topbar.btnSettings.setImageResource(
+                        if (!currentlyDark) R.drawable.ic_dark_mode
+                        else R.drawable.ic_light_mode
+                    )
+
                     true
                 }
             popup.show()
