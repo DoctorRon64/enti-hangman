@@ -14,16 +14,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import java.util.Locale
 
+import androidx.activity.viewModels
+
 class GameActivity : AppCompatActivity() {
 
+    private val gameViewModel: GameViewModel by viewModels()
     private lateinit var tvWordMasked: TextView
     private lateinit var imgHangman: ImageView
     private lateinit var resultOverlay: View
     private lateinit var gridKeyboard: GridLayout
 
-    private var wordToGuess: String = ""
-    private var guessedLetters: MutableSet<Char> = mutableSetOf()
-    private var wrongAttempts: Int = 0
     private val maxAttempts = 6
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,15 +40,103 @@ class GameActivity : AppCompatActivity() {
             showSettingsPopup(view)
         }
 
-        wordToGuess = intent.getStringExtra("selectedWord")?.uppercase(Locale.getDefault()) ?: "ANDROID"
+        if (savedInstanceState == null) {
+            gameViewModel.wordToGuess = intent.getStringExtra("selectedWord")?.uppercase() ?: "ANDROID"
+            gameViewModel.guessedLetters.clear()
+            gameViewModel.wrongAttempts = 0
+        }
 
-        guessedLetters.clear()
-        wrongAttempts = 0
         resultOverlay.visibility = View.GONE
-        imgHangman.setImageResource(R.drawable.ic_hangman_0)
 
         setupKeyboard()
         updateMaskedWord()
+        updateHangmanImage()
+    }
+
+    private fun onLetterGuessed(letter: Char) {
+        val l = letter.uppercaseChar()
+        if (gameViewModel.guessedLetters.contains(l)) return
+
+        gameViewModel.guessedLetters.add(l)
+
+        if (!gameViewModel.wordToGuess.contains(l)) {
+            gameViewModel.wrongAttempts++
+            updateHangmanImage()
+        }
+
+        updateMaskedWord()
+        checkGameStatus()
+    }
+
+    private fun updateMaskedWord() {
+        val masked = gameViewModel.wordToGuess.map { ch ->
+            when {
+                !ch.isLetter() -> ch
+                gameViewModel.guessedLetters.contains(ch) -> ch
+                else -> '_'
+            }
+        }.joinToString(" ")
+        tvWordMasked.text = masked
+    }
+
+    private fun updateHangmanImage() {
+        val isNightMode = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
+        val hangmanImageResource = when (gameViewModel.wrongAttempts) {
+            0 -> if (isNightMode) R.drawable.ic_hangman_0_dark else R.drawable.ic_hangman_0
+            1 -> if (isNightMode) R.drawable.ic_hangman_1_dark else R.drawable.ic_hangman_1
+            2 -> if (isNightMode) R.drawable.ic_hangman_2_dark else R.drawable.ic_hangman_2
+            3 -> if (isNightMode) R.drawable.ic_hangman_3_dark else R.drawable.ic_hangman_3
+            4 -> if (isNightMode) R.drawable.ic_hangman_4_dark else R.drawable.ic_hangman_4
+            5 -> if (isNightMode) R.drawable.ic_hangman_5_dark else R.drawable.ic_hangman_5
+            6 -> if (isNightMode) R.drawable.ic_hangman_6_dark else R.drawable.ic_hangman_6
+            else -> if (isNightMode) R.drawable.ic_hangman_6_dark else R.drawable.ic_hangman_6
+        }
+        imgHangman.setImageResource(hangmanImageResource)
+    }
+
+    private fun checkGameStatus() {
+        if (gameViewModel.wrongAttempts >= maxAttempts) {
+            showResult(getString(R.string.you_lose) + " (${gameViewModel.wordToGuess})")
+            return
+        }
+        val allLettersRevealed = gameViewModel.wordToGuess.filter { it.isLetter() }.all { gameViewModel.guessedLetters.contains(it) }
+        if (allLettersRevealed) {
+            showResult(getString(R.string.you_win))
+        }
+    }
+
+    private fun enableAllKeyboardButtons(enabled: Boolean) {
+        for (i in 0 until gridKeyboard.childCount) {
+            gridKeyboard.getChildAt(i).isEnabled = enabled
+        }
+    }
+
+    private fun setupKeyboard() {
+        gridKeyboard.removeAllViews()
+        for (i in 'A'..'Z') {
+            val button = LayoutInflater.from(this).inflate(R.layout.button_letter, gridKeyboard, false) as Button
+            button.text = i.toString()
+            button.isAllCaps = false
+            button.setOnClickListener {
+                onLetterGuessed(i)
+                button.isEnabled = false
+            }
+            gridKeyboard.addView(button)
+        }
+        enableAllKeyboardButtons(true)
+    }
+
+    private fun showResult(message: String) {
+        resultOverlay.visibility = View.VISIBLE
+        val tvResultText: TextView = resultOverlay.findViewById(R.id.tvResultText)
+        tvResultText.text = message
+        enableAllKeyboardButtons(false)
+        resultOverlay.setOnClickListener {
+            val intent = Intent(this, LevelSelectorActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun toggleNightMode() {
@@ -59,7 +147,6 @@ class GameActivity : AppCompatActivity() {
             AppCompatDelegate.MODE_NIGHT_YES
 
         AppCompatDelegate.setDefaultNightMode(newMode)
-        updateHangmanImage()
     }
 
     private fun showSettingsPopup(anchor: View) {
@@ -73,103 +160,5 @@ class GameActivity : AppCompatActivity() {
             true
         }
         popup.show()
-    }
-
-    private fun setupKeyboard() {
-        gridKeyboard.removeAllViews()
-        for (i in 'A'..'Z') {
-            val button = createLetterButton(i)
-            gridKeyboard.addView(button)
-        }
-        enableAllKeyboardButtons(true)
-    }
-
-    private fun createLetterButton(letter: Char): View {
-        val button = LayoutInflater.from(this).inflate(R.layout.button_letter, gridKeyboard, false) as Button
-        button.text = letter.toString()
-        button.isAllCaps = false
-        button.setOnClickListener {
-            onLetterGuessed(letter)
-            button.isEnabled = false
-        }
-        return button
-    }
-
-    private fun enableAllKeyboardButtons(enabled: Boolean) {
-        for (i in 0 until gridKeyboard.childCount) {
-            gridKeyboard.getChildAt(i).isEnabled = enabled
-        }
-    }
-
-    private fun updateMaskedWord() {
-        val masked = wordToGuess.map { ch ->
-            when {
-                !ch.isLetter() -> ch
-                guessedLetters.contains(ch) -> ch
-                else -> '_'
-            }
-        }.joinToString(" ")
-        tvWordMasked.text = masked
-    }
-
-    private fun checkGameStatus() {
-        if (wrongAttempts >= maxAttempts) {
-            showResult(getString(R.string.you_lose) + " (${wordToGuess})")
-            return
-        }
-        val allLettersRevealed = wordToGuess.filter { it.isLetter() }.all { guessedLetters.contains(it) }
-        if (allLettersRevealed) {
-            showResult(getString(R.string.you_win))
-        }
-    }
-
-    private fun onLetterGuessed(letter: Char) {
-        val l = letter.uppercaseChar()
-        if (guessedLetters.contains(l)) return
-
-        guessedLetters.add(l)
-
-        if (!wordToGuess.contains(l)) {
-            wrongAttempts++
-            updateHangmanImage()
-        }
-
-        updateMaskedWord()
-        checkGameStatus()
-    }
-
-    private fun updateHangmanImage() {
-        val isNightMode = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
-        val hangmanImageResource = when (wrongAttempts) {
-            0 -> if (isNightMode) R.drawable.ic_hangman_0_dark else R.drawable.ic_hangman_0
-            1 -> if (isNightMode) R.drawable.ic_hangman_1_dark else R.drawable.ic_hangman_1
-            2 -> if (isNightMode) R.drawable.ic_hangman_2_dark else R.drawable.ic_hangman_2
-            3 -> if (isNightMode) R.drawable.ic_hangman_3_dark else R.drawable.ic_hangman_3
-            4 -> if (isNightMode) R.drawable.ic_hangman_4_dark else R.drawable.ic_hangman_4
-            5 -> if (isNightMode) R.drawable.ic_hangman_5_dark else R.drawable.ic_hangman_5
-            6 -> if (isNightMode) R.drawable.ic_hangman_6_dark else R.drawable.ic_hangman_6
-            else -> if (isNightMode) R.drawable.ic_hangman_6_dark else R.drawable.ic_hangman_6
-        }
-        imgHangman.setImageResource(hangmanImageResource)
-    }
-
-    private fun showResult(message: String) {
-        resultOverlay.visibility = View.VISIBLE
-        val tvResultText: TextView = resultOverlay.findViewById(R.id.tvResultText)
-        tvResultText.text = message
-
-        enableAllKeyboardButtons(false)
-
-        resultOverlay.setOnClickListener {
-            val intent = Intent(this, LevelSelectorActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(intent)
-            finish()
-        }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
     }
 }
