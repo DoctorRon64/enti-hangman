@@ -8,6 +8,8 @@ import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import java.util.Locale
 
 class GameActivity : AppCompatActivity() {
 
@@ -25,15 +27,41 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        wordToGuess = intent.getStringExtra("selectedWord") ?: ""
-
         tvWordMasked = findViewById(R.id.tvWordMasked)
         imgHangman = findViewById(R.id.imgHangman)
         resultOverlay = findViewById(R.id.resultOverlay)
         gridKeyboard = findViewById(R.id.gridKeyboard)
 
+        val switchLang: View = findViewById(R.id.switchLang)
+        val switchTheme: View = findViewById(R.id.switchTheme)
+
+        switchLang.setOnClickListener {
+            val newLang = if (resources.configuration.locale.language == "en") "de" else "en"
+            changeLanguage(newLang)
+        }
+
+        switchTheme.setOnClickListener {
+            val mode = AppCompatDelegate.getDefaultNightMode()
+            if (mode == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+        }
+
         setupKeyboard()
         updateMaskedWord()
+    }
+
+    private fun changeLanguage(langCode: String) {
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
+
+        val config = resources.configuration
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        recreate()
     }
 
     private fun setupKeyboard() {
