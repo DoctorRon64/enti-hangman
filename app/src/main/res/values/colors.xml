@@ -10,4 +10,7 @@
     <color name="theme_dark_secondary">#2e3649</color>
     <color name="theme_dark_accent">#570384</color>
     <color name="theme_dark_text_color">#94b2f7</color>
+
+    <color name="disableKey">#636363</color>
+
 </resources>

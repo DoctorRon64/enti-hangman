@@ -8,5 +8,6 @@
     android:layout_rowWeight="1"
     android:textSize="20sp"
     android:textAppearance="?attr/textAppearanceBodyMedium"
-    android:textColor="?attr/hangmanTextColor"
-    android:background="?attr/colorSecondary"/>
+    android:background="?attr/colorSecondary"
+    android:textColor="@color/btn_text_color"
+    />
