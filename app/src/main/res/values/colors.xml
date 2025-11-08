@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="purple">#6d14e2</color>
-    <color name="purple2">#420DF6</color>
+    <!-- light colors  -->
+    <color name="md_theme_light_primary">#4A63FF</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
+    <color name="md_theme_light_onSurface">#1C1B1F</color>
+
+    <!-- dark colors -->
+    <color name="md_theme_dark_primary">#AEB6FF</color>
+    <color name="md_theme_dark_onPrimary">#1C1B1F</color>
+    <color name="md_theme_dark_surface">#1C1B1F</color>
+    <color name="md_theme_dark_onSurface">#E6E1E5</color>
+
+    <color name="teal_200">#03DAC5</color>
 </resources>

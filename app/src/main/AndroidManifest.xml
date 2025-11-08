@@ -6,13 +6,11 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Hangman"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         tools:targetApi="31">
-        <activity android:name=".GameActivity" />
-        <activity android:name=".LevelSelectorActivity" />
         <activity android:name=".SplashActivity"
             android:exported = "true">
             <intent-filter>
@@ -20,5 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".LevelSelectorActivity" />
+        <activity android:name=".GameActivity" />
     </application>
 </manifest>

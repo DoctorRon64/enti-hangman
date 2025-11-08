@@ -3,39 +3,56 @@ package com.example.hangman
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.PopupMenu
-import com.example.hangman.databinding.TopbarBinding
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hangman.databinding.ActivityLevelSelectorBinding
-import com.example.hangman.util.ThemeManager
+import com.example.hangman.util.LevelRepository
+import com.google.android.material.imageview.ShapeableImageView
 
 class LevelSelectorActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityLevelSelectorBinding
     private lateinit var adapter: LevelAdapter
     private lateinit var prefs: SharedPreferences
 
+    companion object {
+        const val PREFS_NAME = "hangman_prefs"
+        const val PREF_LANG = "lang"
+        const val PREF_DARK = "dark_mode"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        prefs = getSharedPreferences("hangman_prefs", MODE_PRIVATE)
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        applySavedLanguage()
         super.onCreate(savedInstanceState)
         binding = ActivityLevelSelectorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupTopbar()
+
         val levels = LevelRepository.getLevels()
         adapter = LevelAdapter(levels) { position ->
-            // start game
-            val intent = Intent(this, GameActivity::class.java)
-            intent.putExtra("level_index", position)
-            startActivity(intent)
+            startActivity(Intent(this, GameActivity::class.java).apply {
+                putExtra(GameActivity.EXTRA_LEVEL_INDEX, position)
+            })
         }
+
         binding.rvLevels.layoutManager = LinearLayoutManager(this)
         binding.rvLevels.adapter = adapter
     }
 
+    private fun applySavedLanguage() {
+        val lang = prefs.getString(PREF_LANG, "en") ?: "en"
+        val config = resources.configuration
+        val locale = java.util.Locale(lang)
+        java.util.Locale.setDefault(locale)
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
     override fun onResume() {
         super.onResume()
-        val dark = prefs.getBoolean("dark_mode", false)
+        val dark = prefs.getBoolean(PREF_DARK, false)
         androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
             if (dark) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
             else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
@@ -43,32 +60,26 @@ class LevelSelectorActivity : AppCompatActivity() {
     }
 
     private fun setupTopbar() {
-        val topbar = binding.topbar
+        val switchLang: ShapeableImageView = binding.topbar.switchLang
+        val switchTheme: ShapeableImageView = binding.topbar.switchTheme
 
-        // set initial icon depending on current theme state
-        val isDark = ThemeManager.isDarkMode(this)
-        topbar.btnSettings.setImageResource(
-            if (isDark) R.drawable.ic_dark_mode
-            else R.drawable.ic_light_mode
-        )
+        switchTheme.setOnClickListener {
+            prefs.edit().putBoolean(PREF_DARK, !prefs.getBoolean(PREF_DARK, false)).apply()
+            recreate()
+        }
 
-        topbar.btnSettings.setOnClickListener { view ->
-            val popup = PopupMenu(this, view)
-            popup.menu.add(getString(R.string.toggle_theme))
-                .setOnMenuItemClickListener {
+        switchLang.setOnClickListener {
+            val current = prefs.getString(PREF_LANG, "en") ?: "en"
+            val next = if (current == "en") "es" else "en"
+            prefs.edit().putString(PREF_LANG, next).apply()
 
-                    val currentlyDark = ThemeManager.isDarkMode(this)
-                    ThemeManager.applyTheme(this, !currentlyDark)
+            val config = resources.configuration
+            val locale = java.util.Locale(next)
+            java.util.Locale.setDefault(locale)
+            config.setLocale(locale)
+            resources.updateConfiguration(config, resources.displayMetrics)
 
-                    // update icon
-                    topbar.btnSettings.setImageResource(
-                        if (!currentlyDark) R.drawable.ic_dark_mode
-                        else R.drawable.ic_light_mode
-                    )
-
-                    true
-                }
-            popup.show()
+            recreate()
         }
     }
 }

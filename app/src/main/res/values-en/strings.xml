@@ -13,4 +13,5 @@
     <string name="difficulty_hard">Difficult</string>
     <string name="return_to_levels">Tap to return</string>
     <string name="toggle_translation">Toggle Language</string>
+    <string name="debug_word">DEBUG: %1$s</string>
 </resources>

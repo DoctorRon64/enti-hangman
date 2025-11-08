@@ -8,14 +8,15 @@ import com.example.hangman.databinding.ActivitySplashBinding
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // make whole screen tappable
-        binding.root.setOnTouchListener { _, ev ->
-            if (ev.action == MotionEvent.ACTION_UP) {
+        binding.root.setOnTouchListener { view, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                view.performClick()  // Satisfies accessibility / lint
                 startActivity(Intent(this, LevelSelectorActivity::class.java))
                 finish()
             }

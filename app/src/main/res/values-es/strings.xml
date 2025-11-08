@@ -14,4 +14,5 @@
     <string name="difficulty_hard">Difícil</string>
     <string name="return_to_levels">Toca para volver</string>
     <string name="toggle_translation">Cambiar Idioma</string>
+    <string name="debug_word">DEPURAR: %1$s</string>
 </resources>
