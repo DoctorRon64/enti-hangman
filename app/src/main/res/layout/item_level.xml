@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingStart="12dp"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
             app:layout_constraintStart_toEndOf="@id/imgDifficulty"
             app:layout_constraintTop_toTopOf="@id/imgDifficulty"
             app:layout_constraintEnd_toEndOf="parent"/>

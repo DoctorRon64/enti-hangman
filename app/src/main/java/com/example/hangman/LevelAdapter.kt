@@ -39,7 +39,7 @@ class LevelAdapter(
         fun bind(level: Level) {
             tvLevelName.text = level.name
             tvDebugWord.text = level.word
-            tvLettersCount.text = "${level.letterCount} letters"
+            tvLettersCount.text = itemView.context.getString(R.string.letters_count, level.letterCount)
             imgDifficulty.setImageResource(level.difficultyImg)
         }
     }

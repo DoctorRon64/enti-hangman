@@ -1,7 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="TextAppearance.Hangman.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">?attr/hangmanTextColor</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="TextAppearance.Hangman.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/hangmanTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="Theme.Hangman" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/theme_light_primary</item>
         <item name="colorSecondary">@color/theme_light_secondary</item>
         <item name="colorAccent">@color/theme_light_accent</item>
+
+        <item name="android:windowBackground">@color/theme_light_primary</item>
+
+        <item name="hangmanTextColor">@color/theme_light_text_color</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Hangman.TitleLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Hangman.BodyMedium</item>
     </style>
 </resources>

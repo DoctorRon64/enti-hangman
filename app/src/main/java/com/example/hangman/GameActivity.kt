@@ -1,6 +1,7 @@
 package com.example.hangman
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.Button
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import java.util.Locale
@@ -33,20 +35,12 @@ class GameActivity : AppCompatActivity() {
         resultOverlay = findViewById(R.id.resultOverlay)
         gridKeyboard = findViewById(R.id.gridKeyboard)
 
-        val settingsAnchor: View = findViewById(R.id.switchLang)
+        val settingsAnchor: View = findViewById(R.id.btnSettings)
         settingsAnchor.setOnClickListener { view ->
             showSettingsPopup(view)
         }
 
-        val themeIcon: View = findViewById(R.id.switchTheme)
-        themeIcon.setOnClickListener {
-            toggleNightMode()
-        }
-
-        wordToGuess = intent.getStringExtra("selectedWord")?.uppercase(Locale.getDefault()) ?: ""
-        if (wordToGuess.isEmpty()) {
-            wordToGuess = "ANDROID"
-        }
+        wordToGuess = intent.getStringExtra("selectedWord")?.uppercase(Locale.getDefault()) ?: "ANDROID"
 
         guessedLetters.clear()
         wrongAttempts = 0
@@ -59,11 +53,13 @@ class GameActivity : AppCompatActivity() {
 
     private fun toggleNightMode() {
         val mode = AppCompatDelegate.getDefaultNightMode()
-        if (mode == AppCompatDelegate.MODE_NIGHT_YES) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
+        val newMode = if (mode == AppCompatDelegate.MODE_NIGHT_YES)
+            AppCompatDelegate.MODE_NIGHT_NO
+        else
+            AppCompatDelegate.MODE_NIGHT_YES
+
+        AppCompatDelegate.setDefaultNightMode(newMode)
+        updateHangmanImage()
     }
 
     private fun showSettingsPopup(anchor: View) {
@@ -101,8 +97,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun enableAllKeyboardButtons(enabled: Boolean) {
         for (i in 0 until gridKeyboard.childCount) {
-            val v = gridKeyboard.getChildAt(i)
-            v.isEnabled = enabled
+            gridKeyboard.getChildAt(i).isEnabled = enabled
         }
     }
 
@@ -119,7 +114,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun checkGameStatus() {
         if (wrongAttempts >= maxAttempts) {
-            showResult(getString(R.string.you_lose) + " " + String.format("(%s)", wordToGuess))
+            showResult(getString(R.string.you_lose) + " (${wordToGuess})")
             return
         }
         val allLettersRevealed = wordToGuess.filter { it.isLetter() }.all { guessedLetters.contains(it) }
@@ -131,26 +126,29 @@ class GameActivity : AppCompatActivity() {
     private fun onLetterGuessed(letter: Char) {
         val l = letter.uppercaseChar()
         if (guessedLetters.contains(l)) return
+
         guessedLetters.add(l)
+
         if (!wordToGuess.contains(l)) {
             wrongAttempts++
             updateHangmanImage()
-        } else {
         }
+
         updateMaskedWord()
         checkGameStatus()
     }
 
     private fun updateHangmanImage() {
+        val isNightMode = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
         val hangmanImageResource = when (wrongAttempts) {
-            0 -> R.drawable.ic_hangman_0
-            1 -> R.drawable.ic_hangman_1
-            2 -> R.drawable.ic_hangman_2
-            3 -> R.drawable.ic_hangman_3
-            4 -> R.drawable.ic_hangman_4
-            5 -> R.drawable.ic_hangman_5
-            6 -> R.drawable.ic_hangman_6
-            else -> R.drawable.ic_hangman_6
+            0 -> if (isNightMode) R.drawable.ic_hangman_0_dark else R.drawable.ic_hangman_0
+            1 -> if (isNightMode) R.drawable.ic_hangman_1_dark else R.drawable.ic_hangman_1
+            2 -> if (isNightMode) R.drawable.ic_hangman_2_dark else R.drawable.ic_hangman_2
+            3 -> if (isNightMode) R.drawable.ic_hangman_3_dark else R.drawable.ic_hangman_3
+            4 -> if (isNightMode) R.drawable.ic_hangman_4_dark else R.drawable.ic_hangman_4
+            5 -> if (isNightMode) R.drawable.ic_hangman_5_dark else R.drawable.ic_hangman_5
+            6 -> if (isNightMode) R.drawable.ic_hangman_6_dark else R.drawable.ic_hangman_6
+            else -> if (isNightMode) R.drawable.ic_hangman_6_dark else R.drawable.ic_hangman_6
         }
         imgHangman.setImageResource(hangmanImageResource)
     }

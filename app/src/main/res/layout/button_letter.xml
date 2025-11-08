@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/buttonLetter"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:id="@+id/btnLetter"
+    android:layout_width="0dp"
+    android:layout_height="48dp"
     android:layout_margin="4dp"
-    android:textSize="24sp"
-    android:background="?attr/colorAccent"
-    android:textColor="@android:color/white" />
+    android:layout_columnWeight="1"
+    android:layout_rowWeight="1"
+    android:textSize="20sp"
+    android:textAppearance="?attr/textAppearanceBodyMedium"
+    android:textColor="?attr/hangmanTextColor"
+    android:background="?attr/colorSecondary"/>
