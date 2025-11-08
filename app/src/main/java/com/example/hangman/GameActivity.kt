@@ -1,168 +1,106 @@
 package com.example.hangman
 
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.View
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.GridLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.hangman.databinding.ActivityGameBinding
-import com.example.hangman.util.LevelRepository
 
 class GameActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityGameBinding
-    private lateinit var prefs: SharedPreferences
+    private lateinit var tvWordMasked: TextView
+    private lateinit var imgHangman: ImageView
+    private lateinit var resultOverlay: View
+    private lateinit var gridKeyboard: GridLayout
 
-    private lateinit var word: String
-    private lateinit var masked: CharArray
-    private var incorrect = 0
-    private val maxIncorrect = 6
-    private lateinit var usedLetters: MutableSet<Char>
-
-    companion object {
-        const val PREFS_NAME = "hangman_prefs"
-        const val PREF_LANG = "lang"
-        const val PREF_DARK = "dark_mode"
-        const val EXTRA_LEVEL_INDEX = "level_index"
-    }
+    private var wordToGuess: String = ""
+    private var guessedLetters: MutableSet<Char> = mutableSetOf()
+    private var wrongAttempts: Int = 0
+    private val maxAttempts = 6
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        applySavedLanguage()
         super.onCreate(savedInstanceState)
-        binding = ActivityGameBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_game)
 
-        setupTopbar()
-        loadLevel()
+        wordToGuess = intent.getStringExtra("selectedWord") ?: ""
+
+        tvWordMasked = findViewById(R.id.tvWordMasked)
+        imgHangman = findViewById(R.id.imgHangman)
+        resultOverlay = findViewById(R.id.resultOverlay)
+        gridKeyboard = findViewById(R.id.gridKeyboard)
+
         setupKeyboard()
-        setupResultOverlay()
-        enableHardwareKeyboardInput()
-    }
-
-    private fun applySavedLanguage() {
-        val lang = prefs.getString(PREF_LANG, "en") ?: "en"
-        val config = resources.configuration
-        val locale = java.util.Locale(lang)
-        java.util.Locale.setDefault(locale)
-        config.setLocale(locale)
-        resources.updateConfiguration(config, resources.displayMetrics)
-    }
-
-    private fun loadLevel() {
-        val index = intent.getIntExtra(EXTRA_LEVEL_INDEX, 0).coerceAtLeast(0)
-        val levels = LevelRepository.getLevels()
-        word = levels[index.coerceAtMost(levels.lastIndex)].word.uppercase()
-
-        masked = CharArray(word.length) { if (word[it] == ' ') ' ' else '_' }
-        usedLetters = mutableSetOf()
-        incorrect = 0
-
-        updateMaskedText()
-        loadHangmanImage()
+        updateMaskedWord()
     }
 
     private fun setupKeyboard() {
-        val grid = binding.gridKeyboard
-        grid.removeAllViews()
-
-        for (c in 'A'..'Z') {
-            val button = Button(this, null, 0, R.style.KeyboardButton).apply {
-                text = c.toString()
-                layoutParams = GridLayout.LayoutParams().apply {
-                    width = 0
-                    height = GridLayout.LayoutParams.WRAP_CONTENT
-                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                    setMargins(6, 6, 6, 6)
-                }
-                setOnClickListener {
-                    isEnabled = false
-                    alpha = 0.5f
-                    handleGuess(c)
-                }
-            }
-            grid.addView(button)
+        // Initialize keyboard buttons dynamically based on the alphabet
+        for (i in 'A'..'Z') {
+            val button = createLetterButton(i)
+            gridKeyboard.addView(button)
         }
     }
 
-    private fun setupResultOverlay() {
-        binding.resultOverlay.setOnClickListener {
-            startActivity(Intent(this, LevelSelectorActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            })
-            finish()
+    private fun createLetterButton(letter: Char): View {
+        val button = LayoutInflater.from(this).inflate(R.layout.button_letter, gridKeyboard, false) as Button
+        button.text = letter.toString()
+        button.setOnClickListener {
+            onLetterGuessed(letter)
+            button.isEnabled = false // Disable button after guessing
+        }
+        return button
+    }
+
+    private fun updateMaskedWord() {
+        // Update the displayed word with the currently guessed letters
+        tvWordMasked.text = wordToGuess.map { if (it in guessedLetters) it else '_' }.joinToString(" ")
+    }
+
+    private fun checkGameStatus() {
+        if (wrongAttempts >= maxAttempts) {
+            // Player loses, show overlay with message
+            showResult("You Lose! The word was: $wordToGuess")
+        } else if (wordToGuess.all { it in guessedLetters }) {
+            // Player wins, show overlay with message
+            showResult("You Win!")
         }
     }
 
-    private fun enableHardwareKeyboardInput() {
-        binding.root.isFocusableInTouchMode = true
-        binding.root.requestFocus()
-        binding.root.setOnKeyListener { _, _, event ->
-            if (event.action == KeyEvent.ACTION_UP) {
-                val ch = event.unicodeChar.toChar().uppercaseChar()
-                if (ch in 'A'..'Z') handleGuess(ch)
-            }
-            false
+    private fun onLetterGuessed(letter: Char) {
+        guessedLetters.add(letter)
+        if (letter !in wordToGuess) {
+            wrongAttempts++
+            // Update hangman image according to the number of wrong attempts
+            updateHangmanImage()
         }
+        updateMaskedWord()
+        checkGameStatus()
     }
 
-    private fun updateMaskedText() {
-        binding.tvWordMasked.text = masked.joinToString(" ")
-    }
-
-    private fun loadHangmanImage() {
-        val id = resources.getIdentifier("hangman_$incorrect", "drawable", packageName)
-        binding.imgHangman.setImageResource(id)
-    }
-
-    private fun handleGuess(ch: Char) {
-        if (!usedLetters.add(ch)) return
-
-        val matches = word.indices.filter { word[it] == ch }
-        if (matches.isNotEmpty()) {
-            matches.forEach { masked[it] = ch }
-            updateMaskedText()
-            if (!masked.contains('_')) showResult(true)
-        } else {
-            incorrect++
-            loadHangmanImage()
-            if (incorrect >= maxIncorrect) {
-                binding.tvWordMasked.text = word.toCharArray().joinToString(" ")
-                showResult(false)
-            }
+    private fun updateHangmanImage() {
+        val hangmanImageResource = when (wrongAttempts) {
+            1 -> R.drawable.ic_hangman_1
+            2 -> R.drawable.ic_hangman_2
+            3 -> R.drawable.ic_hangman_3
+            4 -> R.drawable.ic_hangman_4
+            5 -> R.drawable.ic_hangman_5
+            6 -> R.drawable.ic_hangman_6
+            else -> R.drawable.ic_hangman_0 // Initial state
         }
+        imgHangman.setImageResource(hangmanImageResource)
     }
 
-    private fun showResult(win: Boolean) {
-        binding.tvResultText.text = if (win) getString(R.string.you_win) else getString(R.string.you_lose)
-        binding.resultOverlay.visibility = View.VISIBLE
-    }
+    private fun showResult(message: String) {
+        resultOverlay.visibility = View.VISIBLE
+        val tvResultText: TextView = resultOverlay.findViewById(R.id.tvResultText)
+        tvResultText.text = message
 
-    override fun onResume() {
-        super.onResume()
-        val dark = prefs.getBoolean(PREF_DARK, false)
-        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
-            if (dark) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-        )
-    }
-
-    private fun setupTopbar() {
-        val switchLang = binding.topbar.switchLang
-        val switchTheme = binding.topbar.switchTheme
-
-        switchTheme.setOnClickListener {
-            prefs.edit().putBoolean(PREF_DARK, !prefs.getBoolean(PREF_DARK, false)).apply()
-            recreate()
-        }
-
-        switchLang.setOnClickListener {
-            val next = if (prefs.getString(PREF_LANG, "en") == "en") "es" else "en"
-            prefs.edit().putString(PREF_LANG, next).apply()
-            recreate()
+        // Hide the keyboard and set up a return action
+        resultOverlay.setOnClickListener {
+            finish() // or navigate back to LevelSelectorActivity
         }
     }
 }
