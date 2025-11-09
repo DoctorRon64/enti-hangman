@@ -37,11 +37,11 @@ class LevelSelectorActivity : AppCompatActivity() {
         }
 
         val rawWords = listOf(
-            "CAT","DOG","CAR","BLUE","APPLE","ORANGE","BANANA", "GRID",
+            "CAT","DOG","CAR","BLUE","APPLE","ORANGE","BANANA",
             "ELEPHANT","KANGAROO","COMPUTER","PROGRAMMING","ANDROID",
-            "MOUNTAIN","RIVER","LANGUAGE","DEVELOPER","KOTLIN","VARIABLE",
-            "FUNCTION","ACTIVITY","FRAGMENT","LAYOUT","RESOURCE","DRAWABLE",
-            "BUTTON","TEXTVIEW","RECYCLERVIEW","KEYBOARD","HANGMAN"
+            "MOUNTAIN","RIVER","LANGUAGE", "BOAT", "TELEVISION",
+            "FUNCTION","DRAWING", "RACER",
+            "KEYBOARD","HANGMAN", "TOWEL"
         )
 
         val levels = rawWords.mapIndexed { index, w ->
