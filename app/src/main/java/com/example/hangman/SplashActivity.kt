@@ -14,7 +14,7 @@ class SplashActivity : AppCompatActivity() {
         val rootView: View = findViewById(R.id.root)
         rootView.setOnClickListener {
             startActivity(Intent(this, LevelSelectorActivity::class.java))
-            finish() // Close the splash screen
+            finish()
         }
     }
 }

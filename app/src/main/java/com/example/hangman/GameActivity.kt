@@ -17,7 +17,6 @@ import java.util.Locale
 import androidx.activity.viewModels
 
 class GameActivity : AppCompatActivity() {
-
     private val gameViewModel: GameViewModel by viewModels()
     private lateinit var tvWordMasked: TextView
     private lateinit var imgHangman: ImageView
@@ -51,6 +50,19 @@ class GameActivity : AppCompatActivity() {
         setupKeyboard()
         updateMaskedWord()
         updateHangmanImage()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        updateHangmanImage()
+        updateMaskedWord()
+
+        for (i in 0 until gridKeyboard.childCount) {
+            val button = gridKeyboard.getChildAt(i) as Button
+            val letter = button.text[0]
+            button.isEnabled = !gameViewModel.guessedLetters.contains(letter)
+        }
     }
 
     private fun onLetterGuessed(letter: Char) {

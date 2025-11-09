@@ -10,7 +10,7 @@
     <string name="letters_count">Letters: %1$d</string>
     <string name="difficulty_easy">Easy</string>
     <string name="difficulty_medium">Medium</string>
-    <string name="difficulty_hard">Difficult</string>
+    <string name="difficulty_hard">Hard</string>
     <string name="return_to_levels">Tap to return</string>
     <string name="toggle_translation">Toggle Language</string>
     <string name="debug_word">DEBUG: %1$s</string>
