@@ -3,6 +3,9 @@
     android:id="@+id/btnLetter"
     android:layout_width="0dp"
     android:layout_height="48dp"
+    android:maxHeight="48dp"
+    android:minHeight="48dp"
+
     android:layout_margin="4dp"
     android:layout_columnWeight="1"
     android:layout_rowWeight="1"
