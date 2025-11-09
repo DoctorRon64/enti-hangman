@@ -113,17 +113,21 @@ class GameActivity : AppCompatActivity() {
 
     private fun setupKeyboard() {
         gridKeyboard.removeAllViews()
+
         for (i in 'A'..'Z') {
             val button = LayoutInflater.from(this).inflate(R.layout.button_letter, gridKeyboard, false) as Button
             button.text = i.toString()
             button.isAllCaps = false
+
+            button.isEnabled = !gameViewModel.guessedLetters.contains(i)
+
             button.setOnClickListener {
                 onLetterGuessed(i)
                 button.isEnabled = false
             }
+
             gridKeyboard.addView(button)
         }
-        enableAllKeyboardButtons(true)
     }
 
     private fun showResult(message: String) {

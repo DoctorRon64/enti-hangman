@@ -16,9 +16,7 @@
         <item name="colorPrimary">@color/theme_light_primary</item>
         <item name="colorSecondary">@color/theme_light_secondary</item>
         <item name="colorAccent">@color/theme_light_accent</item>
-
         <item name="android:windowBackground">@color/theme_light_primary</item>
-
         <item name="hangmanTextColor">@color/theme_light_text_color</item>
         <item name="textAppearanceTitleLarge">@style/TextAppearance.Hangman.TitleLarge</item>
         <item name="textAppearanceBodyMedium">@style/TextAppearance.Hangman.BodyMedium</item>

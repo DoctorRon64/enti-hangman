@@ -3,6 +3,7 @@ package com.example.hangman
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +28,7 @@ class LevelSelectorActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.rvLevels)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Top bar buttons
+        // Settings button
         val settingsAnchor: View = findViewById(R.id.btnSettings)
         settingsAnchor.setOnClickListener { view ->
             showSettingsPopup(view)
@@ -38,7 +39,8 @@ class LevelSelectorActivity : AppCompatActivity() {
             "ELEPHANT","KANGAROO","COMPUTER","PROGRAMMING","ANDROID",
             "MOUNTAIN","RIVER","LANGUAGE","DEVELOPER","KOTLIN","VARIABLE",
             "FUNCTION","ACTIVITY","FRAGMENT","LAYOUT","RESOURCE","DRAWABLE",
-            "BUTTON","TEXTVIEW","RECYCLERVIEW","GRID","KEYBOARD","HANGMAN"
+            "BUTTON","TEXTVIEW","RECYCLERVIEW","GRID","KEYBOARD","HANGMAN",
+            "LIGMAISOMEGALYCOOL"
         )
 
         val levels = rawWords.mapIndexed { index, w ->
