@@ -57,6 +57,7 @@ class GameActivity : AppCompatActivity() {
 
         updateHangmanImage()
         updateMaskedWord()
+        enableFullScreen()
 
         for (i in 0 until gridKeyboard.childCount) {
             val button = gridKeyboard.getChildAt(i) as Button
@@ -92,7 +93,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun updateHangmanImage() {
-        val isNightMode = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
+        val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val isNightMode = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
         val hangmanImageResource = when (gameViewModel.wrongAttempts) {
             0 -> if (isNightMode) R.drawable.ic_hangman_0_dark else R.drawable.ic_hangman_0
             1 -> if (isNightMode) R.drawable.ic_hangman_1_dark else R.drawable.ic_hangman_1
@@ -167,7 +170,6 @@ class GameActivity : AppCompatActivity() {
 
     private fun showSettingsPopup(anchor: View) {
         val popup = android.widget.PopupMenu(this, anchor)
-        popup.menu.add(0, 0, 0, getString(R.string.settings))
         popup.menu.add(0, 1, 1, getString(R.string.toggle_theme))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -176,5 +178,21 @@ class GameActivity : AppCompatActivity() {
             true
         }
         popup.show()
+    }
+
+    private fun enableFullScreen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.let { controller ->
+                controller.hide(android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior = android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+        }
     }
 }

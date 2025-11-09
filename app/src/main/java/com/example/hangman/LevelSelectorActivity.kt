@@ -1,6 +1,7 @@
 package com.example.hangman
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -24,6 +25,8 @@ class LevelSelectorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_level_selector)
+
+        enableFullScreen()
 
         recyclerView = findViewById(R.id.rvLevels)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -79,7 +82,6 @@ class LevelSelectorActivity : AppCompatActivity() {
 
     private fun showSettingsPopup(anchor: View) {
         val popup = android.widget.PopupMenu(this, anchor)
-        popup.menu.add(0, 0, 0, getString(R.string.settings))
         popup.menu.add(0, 1, 1, getString(R.string.toggle_theme))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -88,5 +90,26 @@ class LevelSelectorActivity : AppCompatActivity() {
             true
         }
         popup.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        enableFullScreen()
+    }
+
+    private fun enableFullScreen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.let { controller ->
+                controller.hide(android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior = android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+        }
     }
 }
